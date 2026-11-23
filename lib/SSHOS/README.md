@@ -9,13 +9,14 @@ and afterwards manages about 7 KB a second of ChaCha20-Poly1305. The
 BlueSCSI's processor does each in a few hundredths of a second.
 
 This directory lets a guest hand that work to the BlueSCSI: one vendor
-SCSI command, `0x1D`, on the network device, next to the WiFi commands
-(`0x1C`). A firmware without it rejects the command, and the guest then
+SCSI command, `0xF5`, on the network device. It is in SCSI's
+vendor-specific range and the firmware has no other use for it, so a
+firmware without this rejects it as an unknown command, and the guest then
 does the work itself; a guest that never sends it sees no difference.
 
 ## The command
 
-Six bytes: `1D`, request, `00`, length high, length low, `00`.
+Six bytes: `F5`, request, `00`, length high, length low, `00`.
 
 | Request | The guest writes | then reads back with request `10` |
 |---|---|---|
@@ -39,7 +40,7 @@ the key travels with each packet.
   half of that buffer; the code is linked into flash (see the line in
   `rp2040-template.ld`).
 - Some stack, a few kilobytes at the deepest.
-- Nothing runs unless command `0x1D` arrives.
+- Nothing runs unless command `0xF5` arrives.
 
 The keys cross the SCSI cable in the clear. Both ends are in the same
 machine.
